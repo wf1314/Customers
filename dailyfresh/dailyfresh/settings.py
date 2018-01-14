@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # 配置富文本编辑框
     'tinymce',
     'apps.cart',
     'apps.goods',
@@ -106,12 +107,13 @@ USE_L10N = True
 USE_TZ = True
 
 
-
+# 设置哪个文件使用django内置的与用户模块的
 AUTH_USER_MODEL='users.User'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
+# 配置静态文件路径
 STATICFILES_DIRS = [os.path.join(BASE_DIR,'static')]
 
 # 配置邮箱
@@ -124,3 +126,18 @@ EMAIL_HOST_USER = 'koplyp@163.com'
 EMAIL_HOST_PASSWORD = 'python198'
 #收件人看到的发件人
 EMAIL_FROM = 'dailyfresh<koplyp@163.com>'
+
+# 配置redis为django的缓存
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/11",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+# 配置将session存储在缓存当中
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"

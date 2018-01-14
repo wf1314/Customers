@@ -4,7 +4,7 @@ from django.core.mail import send_mail
 import os
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dailyfresh.settings")
-
+# 创建celery对象,设置中间队列为redis
 app = Celery('dailyfresh', broker='redis://127.0.0.1:6379/5')
 
 
