@@ -200,6 +200,7 @@ class Logout(View):
 
 
 class UserCenterInfo(ReAsView, View):
+    """用户中心的个人中心页面"""
     def get(self, request):
         # 获取登录的user对象
         user = request.user
