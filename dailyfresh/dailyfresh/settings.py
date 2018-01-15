@@ -141,3 +141,6 @@ CACHES = {
 # 配置将session存储在缓存当中
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
+
+# 用户模块装饰器如果检测用户未登录跳转到的路径
+LOGIN_URL = '/users/login'
