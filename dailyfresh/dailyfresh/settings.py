@@ -144,3 +144,12 @@ SESSION_CACHE_ALIAS = "default"
 
 # 用户模块装饰器如果检测用户未登录跳转到的路径
 LOGIN_URL = '/users/login'
+
+# 配置自定义上传文件类所在的位置
+DEFAULT_FILE_STORAGE = 'utils.fdfs.storage.MyStorage'
+
+# 配置FDFS客户端的配置文件所在路径
+FDFS_CL_CONF = os.path.join(BASE_DIR,'utils/fdfs/client.conf')
+
+# 配置nginx服务器的地址
+FDFS_NGINX_CONF = 'http://192.168.11.129:8888/'
