@@ -242,7 +242,8 @@ class UserCenterSite(ReAsView, View):
         # 获取当前用户对象
         user = request.user
         # 通过自定义的管理器方法,查询是否有默认地址
-        address = Address.objects.show_def_addr(user)
+        # address = Address.objects.show_def_addr(user)
+        address = Address.objects.filter(User_id=user)
 
         return render(request, 'users/user_center_site.html', {'res': 'site', 'address': address})
 

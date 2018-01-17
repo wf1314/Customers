@@ -5,16 +5,18 @@
 		<div class="right_content clearfix">
 
 				<h3 class="common_title2">收货地址</h3>
-            {% if address %}
 				<div class="site_con">
 					<dl>
 						<dt>当前地址：</dt>
-						<dd>{{ address.addr }} （{{ address.receiver }} 收） {{ address.phone }}</dd>
+                    {% for i in address %}
+
+						<dd>{{ i.addr }} （{{ i.receiver }} 收） {{ i.phone }}&nbsp&nbsp&nbsp{% if i.is_default == True %}<a href="#">默认</a>{% else %}<a href="#">设为默认</a>{% endif %}</dd>
+                    {% empty %}
+                        暂无收货地址
+                    {% endfor %}
 					</dl>					
 				</div>
-            {% else %}
-                暂无收货地址
-            {% endif %}
+
 
 				<h3 class="common_title2">编辑地址</h3>
 				<div class="site_con">
