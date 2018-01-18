@@ -49,7 +49,7 @@
 			<div class="subtitle fl">
 				<span>|</span>
                 {% for zi in i.wenzi %}
-				<a href="#">{{ zi.goods_sku_id.goods_name }}</a>
+				<a href="{% url 'goods:detail' zi.goods_sku_id.id %}">{{ zi.goods_sku_id.goods_name }}</a>
                     {% endfor %}
 			</div>
 			<a href="#" class="goods_more fr" id="fruit_more">查看更多 ></a>
@@ -60,8 +60,8 @@
 			<ul class="goods_list fl">
                 {% for pt in i.photo %}
 				<li>
-					<h4><a href="#">{{ pt.goods_sku_id.goods_spu_id.goods_name }}</a></h4>
-					<a href="#"><img src="{{ pt.goods_sku_id.goods_img.url }}"></a>
+					<h4><a href="{% url 'goods:detail' pt.goods_sku_id.id %}">{{ pt.goods_sku_id.goods_name }}</a></h4>
+					<a href="{% url 'goods:detail' pt.goods_sku_id.id %}"><img src="{{ pt.goods_sku_id.goods_img.url }}"></a>
 					<div class="prize">¥ {{ pt.goods_sku_id.goods_price }}</div>
 				</li>
 			    {% endfor %}

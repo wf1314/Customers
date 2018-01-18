@@ -224,8 +224,10 @@ class UserCenterInfo(ReAsView, View):
             # 循环遍历查询出的对应商品sku对象
             for sku in skus:
                 # 当两个值相等时将对象添加至列表中(为保证查询到的数据按顺序存放)
-                if sku.id == skus_id:
+                if sku.id == int(sku_id):
                     sku_list.append(sku)
+
+        # print(sku_list)
 
         return render(request, 'users/user_center_info.html', {'res': 'info', 'addr': addr, 'sku_list': sku_list})
 

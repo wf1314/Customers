@@ -25,8 +25,8 @@
 {#                        遍历取出最近浏览的商品sku对象#}
                          {% for sku in sku_list %}
 				        <li>
-                            <a href="detail.html"><img src="{{ sku.goods_img.url }}"></a>
-                            <h4><a href="detail.html">{{ sku.goods_name }}</a></h4>
+                            <a href="{% url 'goods:detail' sku.id %}"><img src="{{ sku.goods_img.url }}"></a>
+                            <h4><a href="{% url 'goods:detail' sku.id %}">{{ sku.goods_name }}</a></h4>
                             <div class="operate">
                             <span class="prize">￥{{ sku.goods_price }}</span>
                             <span class="unit">{{ sku.goods_price }}/{{ sku.goods_unit }}</span>
