@@ -56,12 +56,12 @@ def create_static_html():
                'good_activity': good_activity,
                'sales': sales,
                'cart_count': cart_count}
-
+    # 渲染模板
     res_html = static_temp.render(content)
 
     static_path = os.path.join(settings.BASE_DIR,'static/index.html')
-
+    # 将渲染后的模板写入静态文件
     with open(static_path,'w') as f:
         f.write(res_html)
 
-    print('生成静态页面成功')
+    # print('生成静态页面成功')

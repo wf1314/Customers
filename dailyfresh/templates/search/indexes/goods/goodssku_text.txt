@@ -1,0 +1,4 @@
+{{object.goods_intro}}
+{{object.goods_name}}
+{{object.goods_spu_id.goods_details}}
+{{object.goods_spu_id.goods_name}}
