@@ -9,7 +9,7 @@ from django_redis import get_redis_connection
 
 class CartAdd(View):
     def post(self, request):
-        print(1)
+
         user = request.user
         if not user.is_authenticated():
             return JsonResponse({'res': 6, 'errmes': '用户未登录'})
@@ -98,3 +98,87 @@ class CartInfo(View):
 
 
         return render(request,'cart/cart.html',context)
+
+
+class CartUpdate(View):
+
+    def post(self,request):
+
+        user = request.user
+        if not user.is_authenticated():
+            return JsonResponse({'res': 6, 'errmes': '用户未登录'})
+        # 获取传入的商品id
+        sku_id = request.POST.get('sku_id')
+        # 获取用户添加购物车的数量
+        count = request.POST.get("count")
+
+        if not all([sku_id, count]):
+            return JsonResponse({'res': 0, 'errmes': '数据不完整'})
+
+        try:
+            # 通过商品id获取商品的sku对象
+            sku = GoodsSku.objects.get(id=sku_id)
+        except GoodsSku.DoesNotExist:
+            return JsonResponse({'res': 1, 'errmes': '商品id不存在'})
+
+        try:
+            # 将传入值转换为整数
+            count = int(count)
+        except:
+            return JsonResponse({'res': 2, 'errmes': '商品數量必须为正整数'})
+
+        if count < 1:
+            return JsonResponse({'res': 3, 'errmes': '数量不能小于1件'})
+        # 从redis中读取存入的购物车信息
+        conn = get_redis_connection('default')
+        # 拼接redis中存储的购物车的key
+        cart_key = 'cart_%d' % user.id
+
+        if count > sku.goods_stock:
+
+            return JsonResponse({'res': 4, 'errmes': '商品库存不足'})
+
+        conn.hset(cart_key,sku_id,count)
+
+        all_count = 0
+        for i in conn.hvals(cart_key):
+
+            all_count += int(i)
+
+        return JsonResponse({'res': 5, 'all_count':all_count,'sucmes': '更新购物车成功'})
+
+
+class CartDelete(View):
+
+    def post(self,request):
+
+        user = request.user
+        if not user.is_authenticated():
+            return JsonResponse({'res': 6, 'errmes': '用户未登录'})
+        # 获取传入的商品id
+        sku_id = request.POST.get('sku_id')
+
+        if not all([sku_id]):
+            return JsonResponse({'res': 0, 'errmes': '数据不完整'})
+
+        try:
+            # 通过商品id获取商品的sku对象
+            sku = GoodsSku.objects.get(id=sku_id)
+        except GoodsSku.DoesNotExist:
+            return JsonResponse({'res': 1, 'errmes': '商品id不存在'})
+
+        # 从redis中读取存入的购物车信息
+        conn = get_redis_connection('default')
+        # 拼接redis中存储的购物车的key
+        cart_key = 'cart_%d' % user.id
+
+        conn.hdel(cart_key,sku_id)
+
+        all_count = 0
+        for i in conn.hvals(cart_key):
+            all_count += int(i)
+
+
+        return JsonResponse({'res': 5,  'all_count':all_count,'sucmes': '删除成功'})
+
+

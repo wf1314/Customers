@@ -1,4 +1,5 @@
 {% extends 'goods/base.html' %}
+{% load static from staticfiles %}
 {% block title %}
 	<title>天天生鲜-商品列表</title>
 {% endblock title %}
@@ -64,7 +65,8 @@
 					<div class="operate">
 						<span class="prize">￥{{ data.goods_price }}</span>
 						<span class="unit">{{ data.goods_price }}/{{ data.goods_unit }}</span>
-						<a href="#" class="add_goods" title="加入购物车"></a>
+                        {% csrf_token %}
+						<a href="#" sku_id='{{ data.id }}' class="add_goods" title="加入购物车"></a>
 					</div>
 				</li>
             {% endfor %}
@@ -86,3 +88,34 @@
 	</div>
 
 {% endblock main %}
+{% block js2 %}
+    <script src="{% static 'js/jquery-1.12.4.min.js' %}"></script>
+    <script >
+        $(function () {
+            $('.add_goods').click(function () {
+                var sku_id = $(this).attr('sku_id')
+                var csrf = $('input[name="csrfmiddlewaretoken"]').val()
+                content = {
+                    'sku_id':sku_id,
+                    'count':1,
+                    'csrfmiddlewaretoken':csrf
+                }
+
+                $.post('/cart/add',content, function (data) {
+                    if(data.res == 5){
+                    alert('添加成功')
+
+                }
+                else {
+                    alert('添加失败!')
+                    alert(data.errmes)
+                }
+                $('#show_count').html(data.cart_num)
+                })
+
+            })
+        })
+    
+    </script>
+    
+{% endblock js2 %}
