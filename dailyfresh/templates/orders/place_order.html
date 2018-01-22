@@ -79,22 +79,25 @@
 	</div>
 	<script type="text/javascript" src="{% static 'js/jquery-1.12.4.min.js' %}"></script>
 	<script type="text/javascript">
+        {# 当用户点击提交订单时 #}
 		$('#order_btn').click(function() {
-
-		    var addr_id = $('input[name="addr"]:checked').attr('addr_id')
-            var pay_style = $('input[name="pay_style"]:checked').val()
-            var sku_ids = $(this).attr('sku_ids')
-		    var csrf = $('input[name="csrfmiddlewaretoken"]').val()
-
+            {# 获取用户选中地址的id #}
+		    var addr_id = $('input[name="addr"]:checked').attr('addr_id');]
+            {# 获取用户选择的支付方式 #}
+            var pay_style = $('input[name="pay_style"]:checked').val();
+            {# 获取用户提交的订单id #}
+            var sku_ids = $(this).attr('sku_ids');
+            {# csrf #}
+		    var csrf = $('input[name="csrfmiddlewaretoken"]').val();
             var content = {
 		        'addr_id':addr_id,
                 'pay_style':pay_style,
                 'sku_ids':sku_ids,
                 'csrfmiddlewaretoken':csrf
-            }
-
+            };
+            {# 发起ajax post请求 #}
 		    $.post('/orders/commit',content,function (data) {
-{#		        alert(1)#}
+                {# 如果返回5表示请求成功弹出 成功提示 #}
                 if(data.res == 5){
                     alert(data.sucmes)
                 }

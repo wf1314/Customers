@@ -1,19 +1,19 @@
 from django.shortcuts import render
 from django.views.generic import View
 from utils.base_view import MyRequired
-from django.http import HttpResponse,JsonResponse
+from django.http import HttpResponse, JsonResponse
 from .models import *
 from apps.goods.models import *
 from apps.users.models import *
 from django_redis import get_redis_connection
 from datetime import datetime
+from django.db import transaction
+
 
 # Create your views here.
 
-class Place(MyRequired,View):
-
-    def post(self,request):
-
+class Place(MyRequired, View):
+    def post(self, request):
         user = request.user
         # 获取一个key对应的多个值
         sku_ids = request.POST.getlist('sku_ids')
@@ -23,9 +23,9 @@ class Place(MyRequired,View):
         addrs = Address.objects.filter(User_id=user)
         # 链接redis
         conn = get_redis_connection('default')
-        cart_key = 'cart_%d' %user.id
+        cart_key = 'cart_%d' % user.id
 
-        skus =[]
+        skus = []
         all_count = 0
         all_price = 0
         # 遍历商品id
@@ -33,20 +33,19 @@ class Place(MyRequired,View):
             # 获取对应商品对象
             sku = GoodsSku.objects.get(id=sku_id)
             # 从redis中查询出购物车中商品的数量
-            count = conn.hget(cart_key,sku_id)
+            count = conn.hget(cart_key, sku_id)
             # print(sku.goods_price)
             # 计算出小计的价格
             samll_price = sku.goods_price * int(count)
             # 将数量转换为整数并添加为sku的属性
             sku.count = int(count)
-            #　添加属性，小计
+            # 　添加属性，小计
             sku.samll_price = samll_price
             # 讲ｓｋｕ对象添加到列表中
             skus.append(sku)
             # 累加计算总价格和总数量
             all_count += int(count)
             all_price += samll_price
-
 
         # 默认运费
         freight = 10
@@ -56,22 +55,21 @@ class Place(MyRequired,View):
         # 运费加商品总价
         pay_money = freight + all_price
         context = {
-            'addrs':addrs,
-            'skus':skus,
-            'freight':freight,
-            'all_count':all_count,
-            'all_price':all_price,
-            'pay_money':pay_money,
-            'sku_ids':sku_ids
+            'addrs': addrs,
+            'skus': skus,
+            'freight': freight,
+            'all_count': all_count,
+            'all_price': all_price,
+            'pay_money': pay_money,
+            'sku_ids': sku_ids
         }
 
+        return render(request, 'orders/place_order.html', context)
 
-        return render(request, 'orders/place_order.html',context)
 
-
-class CommitView(MyRequired,View):
-
-    def post(self,request):
+class CommitView(MyRequired, View):
+    @transaction.atomic
+    def post(self, request):
         user = request.user
         # 获取ajax传入地址id
         addr_id = request.POST.get('addr_id')
@@ -80,77 +78,84 @@ class CommitView(MyRequired,View):
         # 获取ajax传入的商品id
         sku_ids = request.POST.get('sku_ids')
 
-        if not all([addr_id,pay_style,sku_ids]):
-
-            return JsonResponse({'res':1, 'errmes':'信息不完整'})
+        if not all([addr_id, pay_style, sku_ids]):
+            return JsonResponse({'res': 1, 'errmes': '信息不完整'})
         # print(addr_id)
         try:
             # 获取地址对象
-            addr = Address.objects.get(id=addr_id)
+            # addr = Address.objects.get(id=addr_id)
+            # 获取互斥锁
+            addr = Address.objects.select_for_update().get(id=addr_id)
         except:
-            return JsonResponse({'res':2,'errmes':'收货地址有误'})
+            return JsonResponse({'res': 2, 'errmes': '收货地址有误'})
         # print(3)
         if pay_style not in Order_mes.pay_dict.keys():
-            return JsonResponse({'res':3, 'errmes':'支付方式有误'})
+            return JsonResponse({'res': 3, 'errmes': '支付方式有误'})
         # 构造订单id
         order_id = datetime.now().strftime('%Y%m%d%H%M%S') + str(user.id)
         # print(order_id)
         total_count = 0
         total_price = 0
-        transport_price=10
+        transport_price = 10
         # user_id = user
         # addr_id = addr
         # 创建订单数据,添加至数据库
-        order = Order_mes.objects.create(order_id=order_id,
-                                 pay_way=pay_style,
-                                 user_id=user,
-                                 addr_id=addr,
-                                 transport_price=transport_price,
-                                 total_count=total_count,
-                                 total_price=total_price)
-        # 将传入的id用,分割为列表
-        sku_ids = sku_ids.split(',')
-        # print(sku_ids)
-        # 创建redis对象
-        conn = get_redis_connection('default')
-        cart_key = 'cart_%d' %user.id
 
-        for sku_id in sku_ids:
-            try:
-                # 获取商品对象
-                sku = GoodsSku.objects.get(id=sku_id)
-            except:
+        sid = transaction.savepoint()
+        try:
+            order = Order_mes.objects.create(order_id=order_id,
+                                             pay_way=pay_style,
+                                             user_id=user,
+                                             addr_id=addr,
+                                             transport_price=transport_price,
+                                             total_count=total_count,
+                                             total_price=total_price)
+            # 将传入的id用,分割为列表
+            sku_ids = sku_ids.split(',')
+            # print(sku_ids)
+            # 创建redis对象
+            conn = get_redis_connection('default')
+            cart_key = 'cart_%d' % user.id
 
-                return JsonResponse({'res':4,'errmes':'商品id不存在'})
-            # 获取对应商品在购物车中的数量
-            goods_count = conn.hget(cart_key,sku_id)
-            # 获取商品的价格
-            goods_price = sku.goods_price
-            # print(goods_count)
-            # print(goods_price)
-            # print(order_id)
-            # print(sku)
-            # 创建订单商品表
-            OrderGoods.objects.create(goods_count=int(goods_count),
-                                      goods_price=goods_price,
-                                      order_mes_id=order,
-                                      goods_sku_id=sku)
-            # print(11111)
-            # 库存减1 销量+1
-            sku.goods_stock -= int(goods_count)
-            sku.goods_annul += int(goods_count )
+            for sku_id in sku_ids:
+                try:
+                    # 获取商品对象
+                    sku = GoodsSku.objects.get(id=sku_id)
+                except:
+                    transaction.savepoint_rollback(sid)
 
-            # 计算商品总数量
-            total_count += int(goods_count)
-            # 计算商品总价格
-            total_price += goods_price*int(goods_count)
-        # print(2)
+                    return JsonResponse({'res': 4, 'errmes': '商品id不存在'})
+                # 获取对应商品在购物车中的数量
+                goods_count = conn.hget(cart_key, sku_id)
+                # 获取商品的价格
+                goods_price = sku.goods_price
+                # print(goods_count)
+                # print(goods_price)
+                # print(order_id)
+                # print(sku)
+                # 创建订单商品表
+                OrderGoods.objects.create(goods_count=int(goods_count),
+                                          goods_price=goods_price,
+                                          order_mes_id=order,
+                                          goods_sku_id=sku)
+                # print(11111)
+                # 库存减1 销量+1
+                sku.goods_stock -= int(goods_count)
+                sku.goods_annul += int(goods_count)
 
-        # 更新订单表的数量和价格属性
-        order.total_count = total_count
-        order.total_price = total_price
-        order.save()
-        # 从购物车中删除
-        conn.hdel(cart_key,*sku_ids)
+                # 计算商品总数量
+                total_count += int(goods_count)
+                # 计算商品总价格
+                total_price += goods_price * int(goods_count)
+            # print(2)
 
-        return JsonResponse({'res':5,'sucmes':'订单创建成功'})
+            # 更新订单表的数量和价格属性
+            order.total_count = total_count
+            order.total_price = total_price
+            order.save()
+            # 从购物车中删除
+            conn.hdel(cart_key, *sku_ids)
+        except Exception as e:
+            transaction.savepoint_rollback(sid)
+            return JsonResponse({'res': 7, 'sucmes': '订单创建失败'})
+        return JsonResponse({'res': 5, 'sucmes': '订单创建成功'})
