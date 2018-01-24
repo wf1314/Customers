@@ -22,7 +22,7 @@
 			<h3>用户中心</h3>
 			<ul>
 				<li><a href="{% url 'users:info' %}"{% if res == 'info' %} class="active"{% endif %}>· 个人信息</a></li>
-				<li><a href="{% url 'users:order' %}"{% if res == 'order' %} class="active"{% endif %}>· 全部订单</a></li>
+				<li><a href="{% url 'users:order' 1 %}"{% if res == 'order' %} class="active"{% endif %}>· 全部订单</a></li>
 				<li><a href="{% url 'users:site' %}"{% if res == 'site' %} class="active"{% endif %}>· 收货地址</a></li>
 			</ul>
 		</div>

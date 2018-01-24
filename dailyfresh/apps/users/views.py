@@ -16,6 +16,7 @@ from django.contrib.auth.decorators import login_required
 from redis import StrictRedis
 from django_redis import get_redis_connection
 from apps.goods.models import *
+from apps.orders.models import *
 
 
 # class ReAsView(View):
@@ -234,8 +235,55 @@ class UserCenterInfo(ReAsView, View):
 
 class UserCenterOrder(ReAsView, View):
     """用户中心订单页面"""
-    def get(self, request):
-        return render(request, 'users/user_center_order.html', {'res': 'order'})
+    def get(self, request,page):
+
+        user = request.user
+        # 获取当前用户的所有订单信息
+        orders = Order_mes.objects.filter(user_id=user).order_by('-create_time')
+        # 便利所有订单
+        for order in orders:
+            # 获取订单对应的订单商品信息
+            order_goods = OrderGoods.objects.filter(order_mes_id=order).order_by('-create_time')
+            # 便利商品订单信息
+            for order_sku in order_goods:
+                #
+                order_sku.samll_price = order_sku.goods_price * order_sku.goods_count
+
+            order.order_skus = order_goods
+
+        # 导入分页类
+        from django.core.paginator import Paginator
+        # 每页显示两条数据
+        paginat = Paginator(orders,1)
+
+        page = int(page)
+        if page > paginat.num_pages:
+            page = 1
+        # 当分页总数小于4时,返回的页码为1到总页码+1
+        if paginat.num_pages < 5:
+            page_list = range(1, paginat.num_pages + 1)
+        # 当用户访问的页码小于3时返回前4页
+        elif page <= 3:
+            page_list = range(1, 6)
+        # 当总页码减用户访问的页码小于等于2时,返回 总页码减3到总页码加1的列表
+        elif (paginat.num_pages - page) <= 2:
+            page_list = range(paginat.num_pages - 4, paginat.num_pages + 1)
+        # 否则返回当前页-2到当前页+2的页码
+        else:
+            page_list = range(page - 3, page + 2)
+
+        # 获取page页的数据
+        page_datas = paginat.page(page)
+
+        context = {
+            'page_datas':page_datas,
+            'page_list':page_list,
+            'res': 'order'
+        }
+
+
+
+        return render(request, 'users/user_center_order.html', context)
 
 
 class UserCenterSite(ReAsView, View):

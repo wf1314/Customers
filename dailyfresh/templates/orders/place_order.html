@@ -82,7 +82,7 @@
         {# 当用户点击提交订单时 #}
 		$('#order_btn').click(function() {
             {# 获取用户选中地址的id #}
-		    var addr_id = $('input[name="addr"]:checked').attr('addr_id');]
+		    var addr_id = $('input[name="addr"]:checked').attr('addr_id');
             {# 获取用户选择的支付方式 #}
             var pay_style = $('input[name="pay_style"]:checked').val();
             {# 获取用户提交的订单id #}
@@ -99,7 +99,17 @@
 		    $.post('/orders/commit',content,function (data) {
                 {# 如果返回5表示请求成功弹出 成功提示 #}
                 if(data.res == 5){
-                    alert(data.sucmes)
+                    			localStorage.setItem('order_finish',2);
+
+			$('.popup_con').fadeIn('fast', function() {
+
+				setTimeout(function(){
+					$('.popup_con').fadeOut('fast',function(){
+						window.location.href = '/users/order';
+					});
+				},3000)
+
+			});
                 }
                 else{
                     alert(data.errmes)
