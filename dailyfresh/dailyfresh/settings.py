@@ -171,3 +171,7 @@ HAYSTACK_CONNECTIONS = {
 HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 # 指定搜索结果每页显示数目
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 6
+
+
+APP_PRIVATE_KEY_PATH = os.path.join(BASE_DIR,'apps/orders/app_private_key.pem')
+APP_PUBLIC_KEY_PATH = os.path.join(BASE_DIR,'apps/orders/app_public_key.pem')

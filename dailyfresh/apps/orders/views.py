@@ -8,6 +8,8 @@ from apps.users.models import *
 from django_redis import get_redis_connection
 from datetime import datetime
 from django.db import transaction
+from alipay import AliPay
+from django.conf import settings
 
 
 # Create your views here.
@@ -189,7 +191,7 @@ class CommitView(MyRequired, View):
         except:
             return JsonResponse({'res': 2, 'errmes': '收货地址有误'})
         # print(3)
-        if pay_style not in Order_mes.pay_dict.keys():
+        if int(pay_style) not in Order_mes.pay_dict.keys():
             return JsonResponse({'res': 3, 'errmes': '支付方式有误'})
         # 构造订单id
         order_id = datetime.now().strftime('%Y%m%d%H%M%S') + str(user.id)
@@ -270,5 +272,145 @@ class CommitView(MyRequired, View):
 
         except Exception as e:
             transaction.savepoint_rollback(sid)
-            return JsonResponse({'res': 7, 'sucmes': '订单创建失败'})
+            return JsonResponse({'res': 7, 'errmes': '订单创建失败'})
         return JsonResponse({'res': 5, 'sucmes': '订单创建成功'})
+
+
+class OrderPay(View):
+
+    def post(self,request):
+
+        user = request.user
+        # 如果用户未登录则返回错误信息
+        print(111)
+        if not user.is_authenticated():
+
+            return JsonResponse({'res':0,'errmes':'用户未登录'})
+        # 获取ajax传入的订单id
+        order_id = request.POST.get('order_id')
+        # 校验数据完整性
+        if not all([order_id]):
+
+            return  JsonResponse({'res':1,'errmes':'数据不完整'})
+
+        try:
+            # 获取订单对象
+            order = Order_mes.objects.get(order_id=order_id,
+                                            user_id=user,
+                                            pay_way=3,
+                                            pay_state=1)
+        except Exception as e:
+
+            return JsonResponse({'res':2,'errmes':'订单id有误'})
+        print(333)
+        alipay = AliPay(
+            appid="2016091300498944", # 应用id
+            app_notify_url=None,  # 默认回调url
+            app_private_key_path=settings.APP_PRIVATE_KEY_PATH,
+            alipay_public_key_path=settings.APP_PUBLIC_KEY_PATH,  # 支付宝的公钥，验证支付宝回传消息使用，不是你自己的公钥,
+            sign_type="RSA2",  # RSA 或者 RSA2
+            debug=True # 默认False True
+        )
+        all_price = order.total_price +order.transport_price
+        # 调用支付宝alipay.trade.page.pay的接口
+        # 电脑网站支付，需要跳转到https://openapi.alipaydev.com/gateway.do? + order_string
+        order_string = alipay.api_alipay_trade_page_pay(
+            out_trade_no=order_id,  # 订单id
+            total_amount=str(all_price),  # 订单总金额
+            subject='天天生鲜%s' % order_id,  # 订单标题
+            return_url=None,
+            notify_url=None  # 可选, 不填则使用默认notify url
+        )
+        pay_url = 'https://openapi.alipaydev.com/gateway.do?' + order_string
+
+
+        return JsonResponse({'res':3,'pay_url':pay_url,'sucmes':'请求成功'})
+
+
+class OrderCheck(View):
+    def post(self, request):
+
+        user = request.user
+        # 如果用户未登录则返回错误信息
+        # print(111)
+        if not user.is_authenticated():
+            return JsonResponse({'res': 0, 'errmes': '用户未登录'})
+        # 获取ajax传入的订单id
+        order_id = request.POST.get('order_id')
+        # 校验数据完整性
+        if not all([order_id]):
+            return JsonResponse({'res': 1, 'errmes': '数据不完整'})
+
+        try:
+            # 获取订单对象
+            order = Order_mes.objects.get(order_id=order_id,
+                                          user_id=user,
+                                          pay_way=3,
+                                          pay_state=1)
+        except Exception as e:
+
+            return JsonResponse({'res': 2, 'errmes': '订单id有误'})
+
+        alipay = AliPay(
+            appid="2016091300498944",  # 应用id
+            app_notify_url=None,  # 默认回调url
+            app_private_key_path=settings.APP_PRIVATE_KEY_PATH,
+            alipay_public_key_path=settings.APP_PUBLIC_KEY_PATH,  # 支付宝的公钥，验证支付宝回传消息使用，不是你自己的公钥,
+            sign_type="RSA2",  # RSA 或者 RSA2
+            debug=True  # 默认False True
+        )
+
+
+        #         "trade_no": "2017032121001004070200176844", # 支付宝交易号
+        #         "code": "10000", # 网关返回码 10000表示成功
+        #         "invoice_amount": "20.00",
+        #         "open_id": "20880072506750308812798160715407",
+        #         "fund_bill_list": [
+        #             {
+        #                 "amount": "20.00",
+        #                 "fund_channel": "ALIPAYACCOUNT"
+        #             }
+        #         ],
+        #         "buyer_logon_id": "csq***@sandbox.com",
+        #         "send_pay_date": "2017-03-21 13:29:17",
+        #         "receipt_amount": "20.00",
+        #         "out_trade_no": "out_trade_no15",
+        #         "buyer_pay_amount": "20.00",
+        #         "buyer_user_id": "2088102169481075",
+        #         "msg": "Success",
+        #         "point_amount": "0.00",
+        #         "trade_status": "TRADE_SUCCESS",# 交易状态
+        #         "total_amount": "20.00"
+        #     },
+        #     "sign": ""
+        # }
+
+
+
+        while True:
+            response = alipay.api_alipay_trade_query(out_trade_no=order_id)
+            print(response)
+
+            code = response.get('code')
+
+            print(response.get("trade_status"),code)
+            if code == '10000' and response.get("trade_status") == 'TRADE_SUCCESS':
+                trade_no = response.get('trade_no')
+                print('test')
+                order.pay_state=4
+                order.pay_no=trade_no
+                order.save()
+                print('ee')
+                return JsonResponse({'res':3,'sucmes':'支付成功'})
+                #支付成功
+
+            elif code == '40004' or (code == '10000' and response.get("trade_status") == 'WAIT_BUYER_PAY'):
+                import time
+                time.sleep(3)
+
+                # 等待支付
+                continue
+            else:
+                # 支付失败
+
+                return JsonResponse({'res':4,'sucmess':'支付失败'})

@@ -249,6 +249,7 @@ class UserCenterOrder(ReAsView, View):
                 #
                 order_sku.samll_price = order_sku.goods_price * order_sku.goods_count
 
+            order.pay_state_str = order.pay_state_dict[order.pay_state]
             order.order_skus = order_goods
 
         # 导入分页类

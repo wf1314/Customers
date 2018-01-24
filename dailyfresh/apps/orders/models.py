@@ -13,10 +13,10 @@ class Order_mes(BaseModel):
 
     )
     pay_dict={
-        '1':'支付宝',
-        '2':'微信',
-        '3':'银联',
-        '4':'货到付款'
+        1:'支付宝',
+        2:'微信',
+        3:'银联',
+        4:'货到付款'
     }
     pay_state_tuple =(
         (1, '待支付'),
@@ -25,6 +25,15 @@ class Order_mes(BaseModel):
         (4, '待评价'),
         (5, '已完成')
     )
+
+    pay_state_dict = {
+        1:'待支付',
+        2:'代发货',
+        3:'待收货',
+        4:'待评价',
+        5:'已完成'
+
+    }
 
     order_id = models.CharField(max_length=128, primary_key=True, verbose_name='订单id')
     pay_way = models.SmallIntegerField(choices=pay_way_tuple,verbose_name='支付方式')
