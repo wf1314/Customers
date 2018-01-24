@@ -244,4 +244,19 @@
         2)视图接受参数后做出对应处理,创建一条订单信息,和对应条数的订单商品信息/
         
 
+第八天进度:
+    主要工作:调用支付宝api实现支付功能
+
+    1.跳转支付页面
+
+        1)当用户点击去付款时,发起ajax post请求
+            (1.1)利用https://github.com/fzlee/alipay/blob/master/README.zh-hans.md开源包实现支付功能.
+            (1.2)初始化接口后利用,初始化对象的api_alipay_trade_page_pay方法来构造支付页面
+            (1.3)将构造好的支付页面返回给ajax请求,前端页面对应返回值不同进行弹窗提示.
+
+        2)当ajax接收到返回值3时表示请求成功,继续发起支付查询页面的ajax请求
+            (2.1)调用api_alipay_trade_query方法获取查询的返回值
+            (2.2)根据返回值判断是否请求成功,如果code对应的状态码为10000,并且trade_status对应的值为TRADE_SUCCESS则表示成功,将成功信息返回给前端
+            (2.3)如果返回的code码为40004或者trade_status对应的值为WAIT_BUYER_PAY表示还未发起请求,等待发起请求后再做处理
+
 
