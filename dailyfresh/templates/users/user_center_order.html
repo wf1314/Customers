@@ -59,17 +59,22 @@
         $(function () {
 
             $('.oper_btn').each(function () {
+                {# 遍历a标签,获取支付状态 #}
                 var state = $(this).attr('pay_state')
 
                 var state_dict = {'1': '去付款', '2': '待发货', '3': '查看物流', '4': '去评价', '5': '已完成'}
+                {# 将内容替换为状态对应的文字 #}
                 $(this).text(state_dict[state])
 
             })
 
             $('.oper_btn').click(function () {
+                {# 当a标签被点击时 获取支付状态 如果是1 链接去付款 #}
                 var state = $(this).attr('pay_state')
                 if (state == 1) {
+                    {# 获取订单id #}
                     var order_id = $(this).attr('order_id')
+                    {# 获取csrf的值 #}
                     var csrf = $('input[name="csrfmiddlewaretoken"]').val()
                     var content = {
                         'order_id': order_id,
@@ -77,13 +82,15 @@
                     }
 
                     $.post('/orders/pay', content, function (data) {
+                        {# 发起post请求 如果返回值为3 表示请求成功 #}
                         if (data.res == 3) {
-
+                            {# 跳转到支付页面 #}
                             window.open(data.pay_url)
+                            {# 再次发起post请求,请求查询支付状态 #}
                             $.post('/orders/check', content, function (data) {
                                 if (data.res == 3) {
-                                    {#                                $('.oper_btn').html('去评价')#}
                                     alert('支付成功')
+                                    {# 重新加载当前页面 #}
                                     location.reload()
 
                                 }
@@ -98,7 +105,7 @@
                     })
                 }
                 else {
-
+                    {# 其他处理    去评价 #}
                 }
 
 

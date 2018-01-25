@@ -302,7 +302,7 @@ class OrderPay(View):
         except Exception as e:
 
             return JsonResponse({'res':2,'errmes':'订单id有误'})
-        print(333)
+        # print(333)
         alipay = AliPay(
             appid="2016091300498944", # 应用id
             app_notify_url=None,  # 默认回调url
@@ -388,23 +388,26 @@ class OrderCheck(View):
 
 
         while True:
+            # 查询支付状态 返回值为以上字典
             response = alipay.api_alipay_trade_query(out_trade_no=order_id)
-            print(response)
-
+            # print(response)
+            # 获取返回值中的状态码 如果状态码为10000表示链接成功
             code = response.get('code')
 
-            print(response.get("trade_status"),code)
+            # print(response.get("trade_status"),code)
             if code == '10000' and response.get("trade_status") == 'TRADE_SUCCESS':
+                # 符合此要求表示请求成功 获取支付编号 更改数据库中的订单数据
                 trade_no = response.get('trade_no')
-                print('test')
+                # print('test')
                 order.pay_state=4
                 order.pay_no=trade_no
                 order.save()
-                print('ee')
+                # print('ee')
                 return JsonResponse({'res':3,'sucmes':'支付成功'})
                 #支付成功
 
             elif code == '40004' or (code == '10000' and response.get("trade_status") == 'WAIT_BUYER_PAY'):
+                # 表示,未发起请求或者等待用户支付状态
                 import time
                 time.sleep(3)
 

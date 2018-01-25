@@ -73,17 +73,16 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="views.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/apps/orders/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="342">
-              <caret line="397" column="35" lean-forward="false" selection-start-line="397" selection-start-column="35" selection-end-line="397" selection-end-column="35" />
+            <state relative-caret-position="298">
+              <caret line="408" column="104" lean-forward="true" selection-start-line="408" selection-start-column="90" selection-end-line="408" selection-end-column="104" />
               <folding>
                 <element signature="e#0#35#0" expanded="true" />
                 <element signature="e#483#1958#0" expanded="false" />
                 <element signature="e#2002#5682#0" expanded="false" />
                 <element signature="e#5724#9736#0" expanded="false" />
-                <element signature="e#9766#11516#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -92,7 +91,7 @@
       <file leaf-file-name="models.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/apps/orders/models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="308">
+            <state relative-caret-position="902">
               <caret line="42" column="14" lean-forward="false" selection-start-line="42" selection-start-column="14" selection-end-line="42" selection-end-column="14" />
               <folding />
             </state>
@@ -102,7 +101,7 @@
       <file leaf-file-name="place_order.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/templates/orders/place_order.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="22">
+            <state relative-caret-position="2464">
               <caret line="112" column="17" lean-forward="false" selection-start-line="112" selection-start-column="17" selection-end-line="112" selection-end-column="17" />
               <folding />
             </state>
@@ -119,11 +118,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="user_center_order.html" pinned="false" current-in-tab="true">
+      <file leaf-file-name="user_center_order.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/templates/users/user_center_order.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1144">
-              <caret line="61" column="30" lean-forward="false" selection-start-line="61" selection-start-column="30" selection-end-line="61" selection-end-column="30" />
+            <state relative-caret-position="545">
+              <caret line="116" column="14" lean-forward="true" selection-start-line="116" selection-start-column="14" selection-end-line="116" selection-end-column="14" />
               <folding />
             </state>
           </provider>
@@ -190,8 +189,8 @@
         <option value="$PROJECT_DIR$/apps/orders/urls.py" />
         <option value="$PROJECT_DIR$/apps/cart/urls.py" />
         <option value="$PROJECT_DIR$/apps/goods/urls.py" />
-        <option value="$PROJECT_DIR$/apps/orders/views.py" />
         <option value="$PROJECT_DIR$/templates/users/user_center_order.html" />
+        <option value="$PROJECT_DIR$/apps/orders/views.py" />
       </list>
     </option>
   </component>
@@ -204,8 +203,8 @@
   <component name="ProjectFrameBounds">
     <option name="x" value="65" />
     <option name="y" value="24" />
-    <option name="width" value="735" />
-    <option name="height" value="576" />
+    <option name="width" value="1301" />
+    <option name="height" value="744" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
@@ -801,10 +800,10 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="65" y="24" width="735" height="576" extended-state="6" />
+    <frame x="65" y="24" width="1301" height="744" extended-state="6" />
     <editor active="false" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.37229437" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25019857" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32923076" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -1145,7 +1144,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-990">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1257,7 +1255,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/apps/orders/models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="308">
+        <state relative-caret-position="902">
           <caret line="42" column="14" lean-forward="false" selection-start-line="42" selection-start-column="14" selection-end-line="42" selection-end-column="14" />
           <folding />
         </state>
@@ -1265,31 +1263,30 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/templates/orders/place_order.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="22">
+        <state relative-caret-position="2464">
           <caret line="112" column="17" lean-forward="false" selection-start-line="112" selection-start-column="17" selection-end-line="112" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/users/user_center_order.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="545">
+          <caret line="116" column="14" lean-forward="true" selection-start-line="116" selection-start-column="14" selection-end-line="116" selection-end-column="14" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/apps/orders/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="342">
-          <caret line="397" column="35" lean-forward="false" selection-start-line="397" selection-start-column="35" selection-end-line="397" selection-end-column="35" />
+        <state relative-caret-position="298">
+          <caret line="408" column="104" lean-forward="true" selection-start-line="408" selection-start-column="90" selection-end-line="408" selection-end-column="104" />
           <folding>
             <element signature="e#0#35#0" expanded="true" />
             <element signature="e#483#1958#0" expanded="false" />
             <element signature="e#2002#5682#0" expanded="false" />
             <element signature="e#5724#9736#0" expanded="false" />
-            <element signature="e#9766#11516#0" expanded="false" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/users/user_center_order.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1144">
-          <caret line="61" column="30" lean-forward="false" selection-start-line="61" selection-start-column="30" selection-end-line="61" selection-end-column="30" />
-          <folding />
         </state>
       </provider>
     </entry>
