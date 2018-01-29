@@ -57,7 +57,7 @@ class Register(View):
             return render(request, 'users/register.html', {'res': '注册信息有误'})
         # 如果邮箱地址不匹配返回错误信息
         if not re.match(r'^[a-z0-9][\w\.\-]*@[a-z0-9\-]+(\.[a-z]{2,5}){1,2}$', email):
-            print(3)
+
             return render(request, 'users/register.html', {'res': '邮箱格式错误'})
 
         try:
@@ -120,7 +120,7 @@ class Active(View):
         try:
             # 将url提取的参数进行解密
             user_id = seria.loads(token)
-            # 从数据库中查找到制定id的账户,讲is_active设置为1表示激活
+            # 从数据库中查找到指定id的账户,讲is_active设置为1表示激活
             user = User.objects.get(id=user_id['user_id'])
             user.is_active = 1
             user.save()
@@ -246,10 +246,11 @@ class UserCenterOrder(ReAsView, View):
             order_goods = OrderGoods.objects.filter(order_mes_id=order).order_by('-create_time')
             # 便利商品订单信息
             for order_sku in order_goods:
-                #
+                # 向类中增加属性小计,方便给模板使用
                 order_sku.samll_price = order_sku.goods_price * order_sku.goods_count
-
+            # 向类中增加属性,支付状态对应的文字
             order.pay_state_str = order.pay_state_dict[order.pay_state]
+
             order.order_skus = order_goods
 
         # 导入分页类

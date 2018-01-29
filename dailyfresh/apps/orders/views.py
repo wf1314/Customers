@@ -71,6 +71,7 @@ class Place(MyRequired, View):
 
 class CommitView1(MyRequired, View):
     """悲观锁"""
+
     @transaction.atomic
     def post(self, request):
         user = request.user
@@ -169,8 +170,10 @@ class CommitView1(MyRequired, View):
             return JsonResponse({'res': 7, 'sucmes': '订单创建失败'})
         return JsonResponse({'res': 5, 'sucmes': '订单创建成功'})
 
+
 class CommitView(MyRequired, View):
     """乐观锁"""
+
     @transaction.atomic
     def post(self, request):
         user = request.user
@@ -236,16 +239,16 @@ class CommitView(MyRequired, View):
                     if int(goods_count) > sku.goods_stock:
                         transaction.savepoint_rollback(sid)
 
-                        return JsonResponse({'res':8,'errmes':'库存不足'})
-
+                        return JsonResponse({'res': 8, 'errmes': '库存不足'})
 
                     # 创建订单商品表
                     old_stock = sku.goods_stock
                     new_stock = old_stock - int(goods_count)
-                    new_annul = sku.goods_annul+ int(goods_count)
-                    res = GoodsSku.objects.filter(id=sku_id,goods_stock=old_stock).update(goods_stock=new_stock,goods_annul=new_annul)
+                    new_annul = sku.goods_annul + int(goods_count)
+                    res = GoodsSku.objects.filter(id=sku_id, goods_stock=old_stock).update(goods_stock=new_stock,
+                                                                                           goods_annul=new_annul)
                     if res == 0:
-                        if i==2:
+                        if i == 2:
                             transaction.savepoint_rollback(sid)
                             return JsonResponse({'res': 7, 'sucmes': '订单创建失败'})
                         continue
@@ -254,8 +257,6 @@ class CommitView(MyRequired, View):
                                               goods_price=goods_price,
                                               order_mes_id=order,
                                               goods_sku_id=sku)
-
-
 
                     # 计算商品总数量
                     total_count += int(goods_count)
@@ -277,41 +278,38 @@ class CommitView(MyRequired, View):
 
 
 class OrderPay(View):
-
-    def post(self,request):
+    def post(self, request):
 
         user = request.user
         # 如果用户未登录则返回错误信息
         print(111)
         if not user.is_authenticated():
-
-            return JsonResponse({'res':0,'errmes':'用户未登录'})
+            return JsonResponse({'res': 0, 'errmes': '用户未登录'})
         # 获取ajax传入的订单id
         order_id = request.POST.get('order_id')
         # 校验数据完整性
         if not all([order_id]):
-
-            return  JsonResponse({'res':1,'errmes':'数据不完整'})
+            return JsonResponse({'res': 1, 'errmes': '数据不完整'})
 
         try:
             # 获取订单对象
             order = Order_mes.objects.get(order_id=order_id,
-                                            user_id=user,
-                                            pay_way=3,
-                                            pay_state=1)
+                                          user_id=user,
+                                          pay_way=3,
+                                          pay_state=1)
         except Exception as e:
 
-            return JsonResponse({'res':2,'errmes':'订单id有误'})
+            return JsonResponse({'res': 2, 'errmes': '订单id有误'})
         # print(333)
         alipay = AliPay(
-            appid="2016091300498944", # 应用id
+            appid="2016091300498944",  # 应用id
             app_notify_url=None,  # 默认回调url
             app_private_key_path=settings.APP_PRIVATE_KEY_PATH,
             alipay_public_key_path=settings.APP_PUBLIC_KEY_PATH,  # 支付宝的公钥，验证支付宝回传消息使用，不是你自己的公钥,
             sign_type="RSA2",  # RSA 或者 RSA2
-            debug=True # 默认False True
+            debug=True  # 默认False True
         )
-        all_price = order.total_price +order.transport_price
+        all_price = order.total_price + order.transport_price
         # 调用支付宝alipay.trade.page.pay的接口
         # 电脑网站支付，需要跳转到https://openapi.alipaydev.com/gateway.do? + order_string
         order_string = alipay.api_alipay_trade_page_pay(
@@ -323,8 +321,7 @@ class OrderPay(View):
         )
         pay_url = 'https://openapi.alipaydev.com/gateway.do?' + order_string
 
-
-        return JsonResponse({'res':3,'pay_url':pay_url,'sucmes':'请求成功'})
+        return JsonResponse({'res': 3, 'pay_url': pay_url, 'sucmes': '请求成功'})
 
 
 class OrderCheck(View):
@@ -359,7 +356,6 @@ class OrderCheck(View):
             sign_type="RSA2",  # RSA 或者 RSA2
             debug=True  # 默认False True
         )
-
 
         #         "trade_no": "2017032121001004070200176844", # 支付宝交易号
         #         "code": "10000", # 网关返回码 10000表示成功
@@ -399,12 +395,12 @@ class OrderCheck(View):
                 # 符合此要求表示请求成功 获取支付编号 更改数据库中的订单数据
                 trade_no = response.get('trade_no')
                 # print('test')
-                order.pay_state=4
-                order.pay_no=trade_no
+                order.pay_state = 4
+                order.pay_no = trade_no
                 order.save()
                 # print('ee')
-                return JsonResponse({'res':3,'sucmes':'支付成功'})
-                #支付成功
+                return JsonResponse({'res': 3, 'sucmes': '支付成功'})
+                # 支付成功
 
             elif code == '40004' or (code == '10000' and response.get("trade_status") == 'WAIT_BUYER_PAY'):
                 # 表示,未发起请求或者等待用户支付状态
@@ -416,4 +412,4 @@ class OrderCheck(View):
             else:
                 # 支付失败
 
-                return JsonResponse({'res':4,'sucmess':'支付失败'})
+                return JsonResponse({'res': 4, 'sucmess': '支付失败'})
